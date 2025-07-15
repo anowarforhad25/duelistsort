@@ -207,7 +207,7 @@ function App() {
         <AppBar position="static">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <FormControlLabel control={<Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />} label="Dark Mode" />
-            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>No Payment Summary</Typography>
+            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>Customer Based No Payment History</Typography>
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Toolbar>
         </AppBar>
@@ -249,7 +249,7 @@ function App() {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <StyledTableCell>Serial</StyledTableCell>
+                  <StyledTableCell>SL_No/StyledTableCell>
                   <StyledTableCell>Client_ID</StyledTableCell>
                   <StyledTableCell>PPPoE_Name</StyledTableCell>
                   <StyledTableCell>Area</StyledTableCell>
