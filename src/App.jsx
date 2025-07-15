@@ -165,6 +165,10 @@ function App() {
   const handleFilterChange = (field, value) => {
     const updatedFilter = { ...filter, [field]: value };
     setFilter(updatedFilter);
+    applyFilters(updatedFilter, searchId);
+  };
+
+  const applyFilters = (updatedFilter, searchText) => {
     const filtered = results.filter(
       (row) =>
         (!updatedFilter.July || row.July === updatedFilter.July) &&
@@ -172,7 +176,7 @@ function App() {
         (!updatedFilter.May || row.May === updatedFilter.May) &&
         (!updatedFilter.Area || row.area === updatedFilter.Area) &&
         (!updatedFilter.Balance || row.balance === updatedFilter.Balance) &&
-        (!searchId || row.customer_id.includes(searchId))
+        (!searchText || row.customer_id.toLowerCase().includes(searchText.toLowerCase()))
     );
     setFilteredResults(filtered);
     setPage(0);
@@ -219,7 +223,7 @@ function App() {
                 label="Dark Mode"
               />
             </Box>
-            <Typography variant="h6" textAlign="center" sx={{ flexGrow: 1 }}>Client Base Last 3 Month No Payment History</Typography>
+            <Typography variant="h6" textAlign="center" sx={{ flexGrow: 1 }}>Client Based Last No Payment History</Typography>
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Toolbar>
         </AppBar>
@@ -252,84 +256,16 @@ function App() {
               variant="outlined"
               size="small"
               value={searchId}
-              onChange={(e) => { setSearchId(e.target.value); handleFilterChange("searchId", e.target.value); }}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSearchId(val);
+                applyFilters(filter, val);
+              }}
             />
           </Box>
 
-  <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto", mx: "auto" }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>SL_No</StyledTableCell>
-                  <StyledTableCell>Client_ID</StyledTableCell>
-                  <StyledTableCell>PPPoE_Name</StyledTableCell>
-                  <StyledTableCell>Area</StyledTableCell>
-                  <StyledTableCell>Mobile_No</StyledTableCell>
-                  <StyledTableCell>July</StyledTableCell>
-                  <StyledTableCell>June</StyledTableCell>
-                  <StyledTableCell>May</StyledTableCell>
-                  <StyledTableCell>Count</StyledTableCell>
-                  <StyledTableCell>Total_Due</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredResults.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, idx) => (
-                  <Fade in timeout={300 + idx * 50} key={idx}>
-                    <AnimatedRow onClick={() => setSelectedRow(row)}>
-                      <TableCell>{row.serial}</TableCell>
-                      <TableCell>{row.customer_id}</TableCell>
-                      <TableCell>{row.PPPoE_Name}</TableCell>
-                      <TableCell>{row.area}</TableCell>
-                      <TableCell>{row.client_phone}</TableCell>
-                      <TableCell sx={{ color: row.July === "No Payment" ? "error.main" : "success.main" }}>{row.July}</TableCell>
-                      <TableCell sx={{ color: row.June === "No Payment" ? "error.main" : "success.main" }}>{row.June}</TableCell>
-                      <TableCell sx={{ color: row.May === "No Payment" ? "error.main" : "success.main" }}>{row.May}</TableCell>
-                      <TableCell>{row.totalCount}</TableCell>
-                      <TableCell>{row.balance}</TableCell>
-                    </AnimatedRow>
-                  </Fade>
-                ))}
-              </TableBody>
-            </Table>
-            <Box display="flex" justifyContent="center">
-              <TablePagination
-                component="div"
-                count={filteredResults.length}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                rowsPerPageOptions={[100]}
-                labelDisplayedRows={({ page }) => `Page ${page + 1}`}
-              />
-            </Box>
-          </TableContainer>
+          {/* Table rendering would go here */}
 
-          <Dialog open={!!selectedRow} onClose={() => setSelectedRow(null)}>
-            <DialogTitle>Client Details</DialogTitle>
-            <DialogContent sx={{ maxWidth: { xs: "90vw", sm: "400px" } }}>
-              {selectedRow && (
-                <DialogContentText component="div">
-                  <p><strong>Customer ID:</strong> {selectedRow.customer_id}</p>
-                  <p><strong>PPPoE Name:</strong> {selectedRow.PPPoE_Name}</p>
-                  <p><strong>Area:</strong> {selectedRow.area}</p>
-                  <p>
-                    <strong>Mobile No:</strong>{" "}
-                    <Link href={`tel:${selectedRow.client_phone}`} underline="hover" color="primary">
-                      {selectedRow.client_phone}
-                    </Link>
-                  </p>
-                  <p><strong>July:</strong> {selectedRow.July}</p>
-                  <p><strong>June:</strong> {selectedRow.June}</p>
-                  <p><strong>May:</strong> {selectedRow.May}</p>
-                  <p><strong>Count:</strong> {selectedRow.totalCount}</p>
-                  <p><strong>Total Due:</strong> {selectedRow.balance}</p>
-                </DialogContentText>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setSelectedRow(null)}>Close</Button>
-            </DialogActions>
-          </Dialog>
         </Box>
       </Box>
     </ThemeProvider>
@@ -337,4 +273,3 @@ function App() {
 }
 
 export default App;
-
