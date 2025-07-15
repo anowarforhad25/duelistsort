@@ -32,10 +32,6 @@ import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 
 const USERS = [
   { username: "01815128906", password: "Abc1234#" },
-  { username: "01816645450", password: "FB1234d@ta" },
-  { username: "01811309143", password: "Abc9876#" },
-  { username: "01814371275", password: "Abc4321#" },
-  { username: "01843350238", password: "Abc@1234" },
 ];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -73,7 +69,7 @@ const fetchSheet = async (sheetId, sheetName) => {
 function App() {
   const [results, setResults] = useState([]);
   const [filteredResults, setFilteredResults] = useState([]);
-  const [filter, setFilter] = useState({ July: "", June: "", May: "", area: "", balance: "" });
+  const [filter, setFilter] = useState({ July: "", June: "", May: "", Area: "", Balance: "" });
   const [summary, setSummary] = useState({ July: 0, June: 0, May: 0 });
   const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
@@ -83,6 +79,7 @@ function App() {
     return sessionStorage.getItem("isLoggedIn") === "true";
   });
   const [loginInfo, setLoginInfo] = useState({ username: "", password: "" });
+  const [searchId, setSearchId] = useState("");
 
   const sheetId = "1LYAKchZIX6qhGqBh4AxrkJU_4bGNMEJgegHHq-kYZwA";
 
@@ -119,8 +116,8 @@ function App() {
       const final = sheet1.map((row, index) => {
         const customer_id = row.customer_id;
         const PPPoE_Name = row.PPPoE_Name || "-";
+        const area = row.area || "-";
         const client_phone = row.client_phone || "";
-        const area = row.area || "";
         let balance = parseFloat(row.balance || 0);
 
         if (balance < 0) {
@@ -133,8 +130,8 @@ function App() {
           serial: index + 1,
           customer_id,
           PPPoE_Name,
-          client_phone,
           area,
+          client_phone,
           July: "No Payment",
           June: sheet2Ids.has(customer_id) ? "No Payment" : "Payment",
           May: sheet3Ids.has(customer_id) ? "No Payment" : "Payment",
@@ -161,16 +158,17 @@ function App() {
     }
   };
 
-  const handleFilterChange = (key, value) => {
-    const updatedFilter = { ...filter, [key]: value };
+  const handleFilterChange = (field, value) => {
+    const updatedFilter = { ...filter, [field]: value };
     setFilter(updatedFilter);
     const filtered = results.filter(
       (row) =>
         (!updatedFilter.July || row.July === updatedFilter.July) &&
         (!updatedFilter.June || row.June === updatedFilter.June) &&
         (!updatedFilter.May || row.May === updatedFilter.May) &&
-        (!updatedFilter.area || row.area === updatedFilter.area) &&
-        (!updatedFilter.balance || row.balance === updatedFilter.balance)
+        (!updatedFilter.Area || row.area === updatedFilter.Area) &&
+        (!updatedFilter.Balance || row.balance === updatedFilter.Balance) &&
+        (!searchId || row.customer_id.includes(searchId))
     );
     setFilteredResults(filtered);
     setPage(0);
@@ -211,46 +209,50 @@ function App() {
       <Box>
         <AppBar position="static">
           <Toolbar sx={{ justifyContent: "space-between" }}>
-            <FormControlLabel control={<Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />} label="Dark Mode" />
-            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>Customer Based No Payment History</Typography>
+            <Box display="flex" alignItems="center" gap={2}>
+              <FormControlLabel
+                control={<Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />}
+                label="Dark Mode"
+              />
+            </Box>
+            <Typography variant="h6" textAlign="center" sx={{ flexGrow: 1 }}>No Payment Summary</Typography>
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Toolbar>
         </AppBar>
 
         <Box sx={{ px: { xs: 1, sm: 2, md: 3 }, py: 2, minHeight: "100vh" }}>
-          <Box mb={2} display="flex" justifyContent="center" gap={4} flexWrap="wrap">
+          <Box mb={2} display="flex" justifyContent="center" gap={4}>
             <Typography variant="subtitle1">July No Payment: {summary.July}</Typography>
             <Typography variant="subtitle1">June No Payment: {summary.June}</Typography>
             <Typography variant="subtitle1">May No Payment: {summary.May}</Typography>
           </Box>
 
           <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={2}>
-            {["July", "June", "May", "area", "balance"].map((key) => (
-              <FormControl key={key} sx={{ minWidth: 120 }} size="small">
-                <InputLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</InputLabel>
+            {["July", "June", "May", "Area", "Balance"].map((field) => (
+              <FormControl key={field} sx={{ minWidth: 120 }} size="small">
+                <InputLabel>{field}</InputLabel>
                 <Select
-                  value={filter[key]}
-                  label={key.charAt(0).toUpperCase() + key.slice(1)}
-                  onChange={(e) => handleFilterChange(key, e.target.value)}
+                  value={filter[field] || ""}
+                  label={field}
+                  onChange={(e) => handleFilterChange(field, e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
-                  {key === "area"
-                    ? [...new Set(results.map((r) => r.area))].map((area, i) => (
-                        <MenuItem key={i} value={area}>{area}</MenuItem>
-                      ))
-                    : key === "balance"
-                    ? [...new Set(results.map((r) => r.balance))].map((balance, i) => (
-                        <MenuItem key={i} value={balance}>{balance}</MenuItem>
-                      ))
-                    : ["No Payment", "Payment"].map((status) => (
-                        <MenuItem key={status} value={status}>{status}</MenuItem>
-                      ))}
+                  {[...new Set(results.map((r) => r[field.toLowerCase()]))].filter(Boolean).map((value) => (
+                    <MenuItem key={value} value={value}>{value}</MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             ))}
+            <TextField
+              label="Search ID"
+              variant="outlined"
+              size="small"
+              value={searchId}
+              onChange={(e) => { setSearchId(e.target.value); handleFilterChange("searchId", e.target.value); }}
+            />
           </Box>
 
-          <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto", mx: "auto" }}>
+  <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto", mx: "auto" }}>
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
@@ -331,3 +333,4 @@ function App() {
 }
 
 export default App;
+
