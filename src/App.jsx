@@ -25,7 +25,8 @@ import {
   FormControlLabel,
   TablePagination,
   AppBar,
-  Toolbar
+  Toolbar,
+  TextField
 } from "@mui/material";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 
@@ -74,18 +75,15 @@ function App() {
   const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(100);
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return sessionStorage.getItem("isLoggedIn") === "true";
-  });
+  const [rowsPerPage] = useState(100);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => sessionStorage.getItem("isLoggedIn") === "true");
   const [loginInfo, setLoginInfo] = useState({ username: "", password: "" });
 
   const sheetId = "1LYAKchZIX6qhGqBh4AxrkJU_4bGNMEJgegHHq-kYZwA";
 
   const handleLogin = () => {
     const match = USERS.find(
-      (user) =>
-        user.username === loginInfo.username && user.password === loginInfo.password
+      (user) => user.username === loginInfo.username && user.password === loginInfo.password
     );
     if (match) {
       setIsLoggedIn(true);
