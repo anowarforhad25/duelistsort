@@ -249,7 +249,7 @@ function App() {
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <StyledTableCell>SL_No/StyledTableCell>
+                  <StyledTableCell>SL_No</StyledTableCell>
                   <StyledTableCell>Client_ID</StyledTableCell>
                   <StyledTableCell>PPPoE_Name</StyledTableCell>
                   <StyledTableCell>Area</StyledTableCell>
