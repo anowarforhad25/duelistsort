@@ -233,8 +233,8 @@ function App() {
                   <StyledTableCell>SL_No</StyledTableCell>
                   <StyledTableCell>Client_ID</StyledTableCell>
                   <StyledTableCell>PPPoE_Name</StyledTableCell>
-                  <StyledTableCell>Area</StyledTableCell>
-                  <StyledTableCell>Mobile</StyledTableCell>
+                  <StyledTableCell>Area_Name</StyledTableCell>
+                  <StyledTableCell>Mobile_No</StyledTableCell>
                   <StyledTableCell>July</StyledTableCell>
                   <StyledTableCell>June</StyledTableCell>
                   <StyledTableCell>May</StyledTableCell>
