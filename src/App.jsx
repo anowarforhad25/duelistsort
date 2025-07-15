@@ -73,7 +73,7 @@ const fetchSheet = async (sheetId, sheetName) => {
 function App() {
   const [results, setResults] = useState([]);
   const [filteredResults, setFilteredResults] = useState([]);
-  const [filter, setFilter] = useState({ July: "", June: "", May: "", Area: "", Balance: "" });
+  const [filter, setFilter] = useState({ July: "", June: "", May: "", area: "", balance: "" });
   const [summary, setSummary] = useState({ July: 0, June: 0, May: 0 });
   const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
@@ -83,7 +83,6 @@ function App() {
     return sessionStorage.getItem("isLoggedIn") === "true";
   });
   const [loginInfo, setLoginInfo] = useState({ username: "", password: "" });
-  const [searchId, setSearchId] = useState("");
 
   const sheetId = "1LYAKchZIX6qhGqBh4AxrkJU_4bGNMEJgegHHq-kYZwA";
 
@@ -120,8 +119,8 @@ function App() {
       const final = sheet1.map((row, index) => {
         const customer_id = row.customer_id;
         const PPPoE_Name = row.PPPoE_Name || "-";
-        const area = row.area || "-";
         const client_phone = row.client_phone || "";
+        const area = row.area || "";
         let balance = parseFloat(row.balance || 0);
 
         if (balance < 0) {
@@ -134,8 +133,8 @@ function App() {
           serial: index + 1,
           customer_id,
           PPPoE_Name,
-          area,
           client_phone,
+          area,
           July: "No Payment",
           June: sheet2Ids.has(customer_id) ? "No Payment" : "Payment",
           May: sheet3Ids.has(customer_id) ? "No Payment" : "Payment",
@@ -162,21 +161,16 @@ function App() {
     }
   };
 
-  const handleFilterChange = (field, value) => {
-    const updatedFilter = { ...filter, [field]: value };
+  const handleFilterChange = (key, value) => {
+    const updatedFilter = { ...filter, [key]: value };
     setFilter(updatedFilter);
-    applyFilters(updatedFilter, searchId);
-  };
-
-  const applyFilters = (updatedFilter, searchText) => {
     const filtered = results.filter(
       (row) =>
         (!updatedFilter.July || row.July === updatedFilter.July) &&
         (!updatedFilter.June || row.June === updatedFilter.June) &&
         (!updatedFilter.May || row.May === updatedFilter.May) &&
-        (!updatedFilter.Area || row.area === updatedFilter.Area) &&
-        (!updatedFilter.Balance || row.balance === updatedFilter.Balance) &&
-        (!searchText || row.customer_id.toLowerCase().includes(searchText.toLowerCase()))
+        (!updatedFilter.area || row.area === updatedFilter.area) &&
+        (!updatedFilter.balance || row.balance === updatedFilter.balance)
     );
     setFilteredResults(filtered);
     setPage(0);
@@ -217,55 +211,119 @@ function App() {
       <Box>
         <AppBar position="static">
           <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Box display="flex" alignItems="center" gap={2}>
-              <FormControlLabel
-                control={<Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />}
-                label="Dark Mode"
-              />
-            </Box>
-            <Typography variant="h6" textAlign="center" sx={{ flexGrow: 1 }}>Client Based Last No Payment History</Typography>
+            <FormControlLabel control={<Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />} label="Dark Mode" />
+            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>Customer Based No Payment History</Typography>
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Toolbar>
         </AppBar>
 
         <Box sx={{ px: { xs: 1, sm: 2, md: 3 }, py: 2, minHeight: "100vh" }}>
-          <Box mb={2} display="flex" justifyContent="center" gap={4}>
+          <Box mb={2} display="flex" justifyContent="center" gap={4} flexWrap="wrap">
             <Typography variant="subtitle1">July No Payment: {summary.July}</Typography>
             <Typography variant="subtitle1">June No Payment: {summary.June}</Typography>
             <Typography variant="subtitle1">May No Payment: {summary.May}</Typography>
           </Box>
 
           <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={2}>
-            {["July", "June", "May", "Area", "Balance"].map((field) => (
-              <FormControl key={field} sx={{ minWidth: 120 }} size="small">
-                <InputLabel>{field}</InputLabel>
+            {["July", "June", "May", "area", "balance"].map((key) => (
+              <FormControl key={key} sx={{ minWidth: 120 }} size="small">
+                <InputLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</InputLabel>
                 <Select
-                  value={filter[field] || ""}
-                  label={field}
-                  onChange={(e) => handleFilterChange(field, e.target.value)}
+                  value={filter[key]}
+                  label={key.charAt(0).toUpperCase() + key.slice(1)}
+                  onChange={(e) => handleFilterChange(key, e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
-                  {[...new Set(results.map((r) => r[field.toLowerCase()]))].filter(Boolean).map((value) => (
-                    <MenuItem key={value} value={value}>{value}</MenuItem>
-                  ))}
+                  {key === "area"
+                    ? [...new Set(results.map((r) => r.area))].map((area, i) => (
+                        <MenuItem key={i} value={area}>{area}</MenuItem>
+                      ))
+                    : key === "balance"
+                    ? [...new Set(results.map((r) => r.balance))].map((balance, i) => (
+                        <MenuItem key={i} value={balance}>{balance}</MenuItem>
+                      ))
+                    : ["No Payment", "Payment"].map((status) => (
+                        <MenuItem key={status} value={status}>{status}</MenuItem>
+                      ))}
                 </Select>
               </FormControl>
             ))}
-            <TextField
-              label="Search ID"
-              variant="outlined"
-              size="small"
-              value={searchId}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSearchId(val);
-                applyFilters(filter, val);
-              }}
-            />
           </Box>
 
-          {/* Table rendering would go here */}
+          <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowX: "auto", mx: "auto" }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>SL_No</StyledTableCell>
+                  <StyledTableCell>Client_ID</StyledTableCell>
+                  <StyledTableCell>PPPoE_Name</StyledTableCell>
+                  <StyledTableCell>Area</StyledTableCell>
+                  <StyledTableCell>Mobile_No</StyledTableCell>
+                  <StyledTableCell>July</StyledTableCell>
+                  <StyledTableCell>June</StyledTableCell>
+                  <StyledTableCell>May</StyledTableCell>
+                  <StyledTableCell>Count</StyledTableCell>
+                  <StyledTableCell>Total_Due</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredResults.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, idx) => (
+                  <Fade in timeout={300 + idx * 50} key={idx}>
+                    <AnimatedRow onClick={() => setSelectedRow(row)}>
+                      <TableCell>{row.serial}</TableCell>
+                      <TableCell>{row.customer_id}</TableCell>
+                      <TableCell>{row.PPPoE_Name}</TableCell>
+                      <TableCell>{row.area}</TableCell>
+                      <TableCell>{row.client_phone}</TableCell>
+                      <TableCell sx={{ color: row.July === "No Payment" ? "error.main" : "success.main" }}>{row.July}</TableCell>
+                      <TableCell sx={{ color: row.June === "No Payment" ? "error.main" : "success.main" }}>{row.June}</TableCell>
+                      <TableCell sx={{ color: row.May === "No Payment" ? "error.main" : "success.main" }}>{row.May}</TableCell>
+                      <TableCell>{row.totalCount}</TableCell>
+                      <TableCell>{row.balance}</TableCell>
+                    </AnimatedRow>
+                  </Fade>
+                ))}
+              </TableBody>
+            </Table>
+            <Box display="flex" justifyContent="center">
+              <TablePagination
+                component="div"
+                count={filteredResults.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                rowsPerPageOptions={[100]}
+                labelDisplayedRows={({ page }) => `Page ${page + 1}`}
+              />
+            </Box>
+          </TableContainer>
 
+          <Dialog open={!!selectedRow} onClose={() => setSelectedRow(null)}>
+            <DialogTitle>Client Details</DialogTitle>
+            <DialogContent sx={{ maxWidth: { xs: "90vw", sm: "400px" } }}>
+              {selectedRow && (
+                <DialogContentText component="div">
+                  <p><strong>Customer ID:</strong> {selectedRow.customer_id}</p>
+                  <p><strong>PPPoE Name:</strong> {selectedRow.PPPoE_Name}</p>
+                  <p><strong>Area:</strong> {selectedRow.area}</p>
+                  <p>
+                    <strong>Mobile No:</strong>{" "}
+                    <Link href={`tel:${selectedRow.client_phone}`} underline="hover" color="primary">
+                      {selectedRow.client_phone}
+                    </Link>
+                  </p>
+                  <p><strong>July:</strong> {selectedRow.July}</p>
+                  <p><strong>June:</strong> {selectedRow.June}</p>
+                  <p><strong>May:</strong> {selectedRow.May}</p>
+                  <p><strong>Count:</strong> {selectedRow.totalCount}</p>
+                  <p><strong>Total Due:</strong> {selectedRow.balance}</p>
+                </DialogContentText>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setSelectedRow(null)}>Close</Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       </Box>
     </ThemeProvider>
