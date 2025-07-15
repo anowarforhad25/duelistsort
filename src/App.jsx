@@ -32,6 +32,10 @@ import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 
 const USERS = [
   { username: "01815128906", password: "Abc1234#" },
+  { username: "01816645450", password: "FB1234d@ta" },
+  { username: "01811309143", password: "Abc9876#" },
+  { username: "01814371275", password: "Abc4321#" },
+  { username: "01843350238", password: "Abc@1234" },
 ];
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -215,7 +219,7 @@ function App() {
                 label="Dark Mode"
               />
             </Box>
-            <Typography variant="h6" textAlign="center" sx={{ flexGrow: 1 }}>No Payment Summary</Typography>
+            <Typography variant="h6" textAlign="center" sx={{ flexGrow: 1 }}>Client Base Last 3 Month No Payment History</Typography>
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Toolbar>
         </AppBar>
