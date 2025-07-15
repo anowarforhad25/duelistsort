@@ -207,6 +207,8 @@ function App() {
                   onChange={(e) => handleFilterChange(field, e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
+                  <MenuItem value="No Payment">No Payment</MenuItem>
+                  <MenuItem value="Payment">Payment</MenuItem>
                   {[...new Set(results.map((r) => r[field.toLowerCase()]))].filter(Boolean).map((value) => (
                     <MenuItem key={value} value={value}>{value}</MenuItem>
                   ))}
