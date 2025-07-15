@@ -301,8 +301,3 @@ function App() {
 }
 
 export default App;
-
-
-it's ok but not found logout option. plz set logout option in the right top corner.
-show area
-filter area & blance
