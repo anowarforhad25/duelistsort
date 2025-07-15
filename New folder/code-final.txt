@@ -1,3 +1,4 @@
+// same imports as before
 import { useEffect, useState } from "react";
 import {
   Box, Table, TableBody, TableCell, TableContainer, TableHead,
@@ -53,7 +54,7 @@ function App() {
   const [filteredResults, setFilteredResults] = useState([]);
   const [filter, setFilter] = useState({ July: "", June: "", May: "", Area: "", Balance: "" });
   const [summary, setSummary] = useState({ July: 0, June: 0, May: 0 });
-  const [selectedRow, setSelectedRow] = useState(null); // State to hold the data of the clicked row
+  const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(100);
@@ -158,6 +159,7 @@ function App() {
     setPage(0);
   };
 
+  
   const handleChangePage = (event, newPage) => setPage(newPage);
 
   useEffect(() => {
@@ -247,8 +249,7 @@ function App() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, idx) => (
                     <Fade in timeout={300 + idx * 20} key={row.customer_id}>
-                      {/* --- IMPORTANT CHANGE HERE --- */}
-                      <AnimatedRow onClick={() => setSelectedRow(row)}>
+                      <AnimatedRow>
                         <TableCell>{row.serial}</TableCell>
                         <TableCell>{row.customer_id}</TableCell>
                         <TableCell>{row.PPPoE_Name}</TableCell>
@@ -275,33 +276,32 @@ function App() {
               rowsPerPageOptions={[100]}
               labelDisplayedRows={({ page }) => `Page ${page + 1}`}
             />
-            {/* Your Dialog code */}
-            <Dialog open={!!selectedRow} onClose={() => setSelectedRow(null)}>
-              <DialogTitle>Client Details</DialogTitle>
-              <DialogContent sx={{ maxWidth: { xs: "90vw", sm: "400px" } }}>
-                {selectedRow && (
-                  <DialogContentText component="div">
-                    <p><strong>Customer ID:</strong> {selectedRow.customer_id}</p>
-                    <p><strong>PPPoE Name:</strong> {selectedRow.PPPoE_Name}</p>
-                    <p><strong>Area:</strong> {selectedRow.area}</p>
-                    <p>
-                      <strong>Mobile No:</strong>{" "}
-                      <Link href={`tel:${selectedRow.client_phone}`} underline="hover" color="primary">
-                        {selectedRow.client_phone}
-                      </Link>
-                    </p>
-                    <p><strong>July:</strong> {selectedRow.July}</p>
-                    <p><strong>June:</strong> {selectedRow.June}</p>
-                    <p><strong>May:</strong> {selectedRow.May}</p>
-                    <p><strong>Count:</strong> {selectedRow.totalCount}</p>
-                    <p><strong>Total Due:</strong> {selectedRow.balance}</p>
-                  </DialogContentText>
-                )}
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setSelectedRow(null)}>Close</Button>
-              </DialogActions>
-            </Dialog>
+<Dialog open={!!selectedRow} onClose={() => setSelectedRow(null)}>
+          <DialogTitle>Client Details</DialogTitle>
+          <DialogContent sx={{ maxWidth: { xs: "90vw", sm: "400px" } }}>
+            {selectedRow && (
+              <DialogContentText component="div">
+                <p><strong>Customer ID:</strong> {selectedRow.customer_id}</p>
+                <p><strong>PPPoE Name:</strong> {selectedRow.PPPoE_Name}</p>
+				<p><strong>Area:</strong> {selectedRow.area}</p>
+                <p>
+                  <strong>Mobile No:</strong>{" "}
+                  <Link href={`tel:${selectedRow.client_phone}`} underline="hover" color="primary">
+                    {selectedRow.client_phone}
+                  </Link>
+                </p>
+                <p><strong>July:</strong> {selectedRow.July}</p>
+                <p><strong>June:</strong> {selectedRow.June}</p>
+                <p><strong>May:</strong> {selectedRow.May}</p>
+                <p><strong>Count:</strong> {selectedRow.totalCount}</p>
+                <p><strong>Total Due:</strong> {selectedRow.balance}</p>
+              </DialogContentText>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setSelectedRow(null)}>Close</Button>
+          </DialogActions>
+</Dialog>
           </Box>
         </Box>
       </Box>
