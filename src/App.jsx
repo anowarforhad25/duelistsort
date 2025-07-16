@@ -53,7 +53,7 @@ function App() {
   const [filteredResults, setFilteredResults] = useState([]);
   const [filter, setFilter] = useState({ July: "", June: "", May: "", Area: "", Balance: "" });
   const [summary, setSummary] = useState({ July: 0, June: 0, May: 0 });
-  const [selectedRow, setSelectedRow] = useState(null); // State to hold the data of the clicked row
+  const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(100);
@@ -123,7 +123,7 @@ function App() {
       });
 
       setResults(final);
-      setFilteredResults(final);
+      setFilteredResults(final); // Initial setting of filtered results
 
       const summaryStats = {
         July: final.length,
@@ -140,7 +140,7 @@ function App() {
   const handleFilterChange = (field, value) => {
     const updatedFilter = { ...filter, [field]: value };
     setFilter(updatedFilter);
-    applyFilters(updatedFilter, searchId);
+    applyFilters(updatedFilter, searchId); // Ensure searchId is passed
   };
 
   const applyFilters = (updatedFilter, searchText) => {
@@ -152,7 +152,6 @@ function App() {
         (!updatedFilter.Area || row.area === updatedFilter.Area) &&
         (!updatedFilter.Balance || row.balance === updatedFilter.Balance) &&
         (!searchText || row.customer_id.toString().toLowerCase().includes(searchText.toLowerCase()))
-
     );
     setFilteredResults(filtered);
     setPage(0);
@@ -195,6 +194,14 @@ function App() {
             <Typography variant="subtitle1">May No Payment: {summary.May}</Typography>
           </Box>
 
+          {/* --- START: Added code for filtered data count --- */}
+          <Box mb={2} display="flex" justifyContent="center">
+            <Typography variant="h6" color="primary">
+              Total Filtered Records: {filteredResults.length}
+            </Typography>
+          </Box>
+          {/* --- END: Added code for filtered data count --- */}
+
           <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={2}>
             {["July", "June", "May", "Area", "Balance"].map((field) => (
               <FormControl key={field} sx={{ minWidth: 120 }} size="small">
@@ -221,7 +228,7 @@ function App() {
               onChange={(e) => {
                 const val = e.target.value;
                 setSearchId(val);
-                applyFilters(filter, val);
+                applyFilters(filter, val); // Ensure filter state is passed
               }}
             />
           </Box>
@@ -233,8 +240,8 @@ function App() {
                   <StyledTableCell>SL_No</StyledTableCell>
                   <StyledTableCell>Client_ID</StyledTableCell>
                   <StyledTableCell>PPPoE_Name</StyledTableCell>
-                  <StyledTableCell>Area_Name</StyledTableCell>
-                  <StyledTableCell>Mobile_No</StyledTableCell>
+                  <StyledTableCell>Area</StyledTableCell>
+                  <StyledTableCell>Mobile</StyledTableCell>
                   <StyledTableCell>July</StyledTableCell>
                   <StyledTableCell>June</StyledTableCell>
                   <StyledTableCell>May</StyledTableCell>
@@ -247,7 +254,6 @@ function App() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, idx) => (
                     <Fade in timeout={300 + idx * 20} key={row.customer_id}>
-                      {/* --- IMPORTANT CHANGE HERE --- */}
                       <AnimatedRow onClick={() => setSelectedRow(row)}>
                         <TableCell>{row.serial}</TableCell>
                         <TableCell>{row.customer_id}</TableCell>
@@ -275,7 +281,6 @@ function App() {
               rowsPerPageOptions={[100]}
               labelDisplayedRows={({ page }) => `Page ${page + 1}`}
             />
-            {/* Your Dialog code */}
             <Dialog open={!!selectedRow} onClose={() => setSelectedRow(null)}>
               <DialogTitle>Client Details</DialogTitle>
               <DialogContent sx={{ maxWidth: { xs: "90vw", sm: "400px" } }}>
