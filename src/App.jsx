@@ -154,7 +154,8 @@ function App() {
         // --- START: MODIFIED CODE FOR ENHANCED SEARCH ---
         (!searchText || 
           (row.customer_id.toString().toLowerCase().includes(searchText.toLowerCase()) ||
-           row.PPPoE_Name.toLowerCase().includes(searchText.toLowerCase()))
+           row.PPPoE_Name.toLowerCase().includes(searchText.toLowerCase())) ||
+           row.client_phone.toLowerCase().includes(searchText.toLowerCase())
         )
         // --- END: MODIFIED CODE FOR ENHANCED SEARCH ---
     );
@@ -242,7 +243,7 @@ function App() {
               </FormControl>
             ))}
             <TextField
-              label="Search_ID / PPPoE_Name" // Updated label for clarity
+              label="Search_ID/PPPoE/Mobile" // Updated label for clarity
               variant="outlined"
               size="small"
               sx={{ minWidth: 150, maxWidth: 250 }}
