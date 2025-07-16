@@ -197,7 +197,7 @@ function App() {
           {/* --- START: Added code for filtered data count --- */}
           <Box mb={2} display="flex" justifyContent="center">
             <Typography variant="h6" color="primary">
-              Total Filtered Records: {filteredResults.length}
+              Total Records Data: {filteredResults.length}
             </Typography>
           </Box>
           {/* --- END: Added code for filtered data count --- */}
