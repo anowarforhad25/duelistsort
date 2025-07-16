@@ -60,6 +60,8 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => sessionStorage.getItem("isLoggedIn") === "true");
   const [loginInfo, setLoginInfo] = useState({ username: "", password: "" });
   const [searchId, setSearchId] = useState("");
+  const [MobileNo, setMobileNo] = useState();
+  const [PPPoEName, setPPPoEName] = useState();
 
   const sheetId = "1LYAKchZIX6qhGqBh4AxrkJU_4bGNMEJgegHHq-kYZwA";
 
@@ -151,7 +153,10 @@ function App() {
         (!updatedFilter.May || row.May === updatedFilter.May) &&
         (!updatedFilter.Area || row.area === updatedFilter.Area) &&
         (!updatedFilter.Balance || row.balance === updatedFilter.Balance) &&
-        (!searchText || row.customer_id.toString().toLowerCase().includes(searchText.toLowerCase()))
+        (!searchText || row.customer_id.toString().toLowerCase().includes(searchText.toLowerCase())) ||
+        (!searchText || row.client_phone.toString().toLowerCase().includes(searchText.toLowerCase())) ||
+        (!searchText || row.PPPoE_Name.toString().toLowerCase().includes(searchText.toLowerCase()))
+        
     );
     setFilteredResults(filtered);
     setPage(0);
@@ -221,9 +226,10 @@ function App() {
               </FormControl>
             ))}
             <TextField
-              label="Search ID"
+              label="Search Client_ID"
               variant="outlined"
               size="small"
+              sx={{ minWidth: 100, maxWidth: 150 }}
               value={searchId}
               onChange={(e) => {
                 const val = e.target.value;
@@ -231,6 +237,30 @@ function App() {
                 applyFilters(filter, val); // Ensure filter state is passed
               }}
             />
+              <TextField
+              label="Search Mobile_No"
+              variant="outlined"
+              size="small"
+              sx={{ minWidth: 100, maxWidth: 200 }}
+              value={MobileNo}
+              onChange={(e) => {
+                const val = e.target.value;
+                setMobileNo(val);
+                applyFilters(filter, val); // Ensure filter state is passed
+              }}
+            />
+        <TextField
+              label="Search PPPoE_Name"
+              variant="outlined"
+              size="small"
+              sx={{ minWidth: 100, maxWidth: 200 }}
+              value={PPPoEName}
+              onChange={(e) => {
+                const val = e.target.value;
+                setPPPoEName(val);
+                applyFilters(filter, val); // Ensure filter state is passed
+              }}
+        />
           </Box>
 
           <TableContainer component={Paper}>
