@@ -60,8 +60,6 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => sessionStorage.getItem("isLoggedIn") === "true");
   const [loginInfo, setLoginInfo] = useState({ username: "", password: "" });
   const [searchId, setSearchId] = useState("");
-  const [MobileNo, setMobileNo] = useState();
-  const [PPPoEName, setPPPoEName] = useState();
 
   const sheetId = "1LYAKchZIX6qhGqBh4AxrkJU_4bGNMEJgegHHq-kYZwA";
 
@@ -125,7 +123,7 @@ function App() {
       });
 
       setResults(final);
-      setFilteredResults(final); // Initial setting of filtered results
+      setFilteredResults(final);
 
       const summaryStats = {
         July: final.length,
@@ -142,7 +140,7 @@ function App() {
   const handleFilterChange = (field, value) => {
     const updatedFilter = { ...filter, [field]: value };
     setFilter(updatedFilter);
-    applyFilters(updatedFilter, searchId); // Ensure searchId is passed
+    applyFilters(updatedFilter, searchId);
   };
 
   const applyFilters = (updatedFilter, searchText) => {
@@ -151,12 +149,14 @@ function App() {
         (!updatedFilter.July || row.July === updatedFilter.July) &&
         (!updatedFilter.June || row.June === updatedFilter.June) &&
         (!updatedFilter.May || row.May === updatedFilter.May) &&
-        (!updatedFilter.Area || row.area === updatedFilter.Area) &&
-        (!updatedFilter.Balance || row.balance === updatedFilter.Balance) &&
-        (!searchText || row.customer_id.toString().toLowerCase().includes(searchText.toLowerCase())) ||
-        (!searchText || row.client_phone.toString().toLowerCase().includes(searchText.toLowerCase())) ||
-        (!searchText || row.PPPoE_Name.toString().toLowerCase().includes(searchText.toLowerCase()))
-        
+        (!updatedFilter.Area || (row.area && row.area.toLowerCase() === updatedFilter.Area.toLowerCase())) &&
+        (!updatedFilter.Balance || (row.balance && row.balance.toLowerCase() === updatedFilter.Balance.toLowerCase())) &&
+        // --- START: MODIFIED CODE FOR ENHANCED SEARCH ---
+        (!searchText || 
+          (row.customer_id.toString().toLowerCase().includes(searchText.toLowerCase()) ||
+           row.PPPoE_Name.toLowerCase().includes(searchText.toLowerCase()))
+        )
+        // --- END: MODIFIED CODE FOR ENHANCED SEARCH ---
     );
     setFilteredResults(filtered);
     setPage(0);
@@ -187,7 +187,7 @@ function App() {
         <AppBar position="static">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <FormControlLabel control={<Switch checked={darkMode} onChange={() => setDarkMode(!darkMode)} />} label="Dark Mode" />
-            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>Customer Based 3 Month No Payment History</Typography>
+            <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>Customer Based Last 3 Month No Payment History</Typography>
             <Button color="inherit" onClick={handleLogout}>Logout</Button>
           </Toolbar>
         </AppBar>
@@ -199,13 +199,11 @@ function App() {
             <Typography variant="subtitle1">May No Payment: {summary.May}</Typography>
           </Box>
 
-          {/* --- START: Added code for filtered data count --- */}
           <Box mb={2} display="flex" justifyContent="center">
             <Typography variant="h6" color="primary">
               Total Records Data: {filteredResults.length}
             </Typography>
           </Box>
-          {/* --- END: Added code for filtered data count --- */}
 
           <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={2}>
             {["July", "June", "May", "Area", "Balance"].map((field) => (
@@ -217,50 +215,44 @@ function App() {
                   onChange={(e) => handleFilterChange(field, e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
-                  <MenuItem value="No Payment">No Payment</MenuItem>
-                  <MenuItem value="Payment">Payment</MenuItem>
-                  {[...new Set(results.map((r) => r[field.toLowerCase()]))].filter(Boolean).map((value) => (
-                    <MenuItem key={value} value={value}>{value}</MenuItem>
-                  ))}
+                  {(() => {
+                    let uniqueValues = new Set();
+                    if (field === "July" || field === "June" || field === "May") {
+                      uniqueValues.add("No Payment");
+                      uniqueValues.add("Payment");
+                    }
+
+                    results.forEach(r => {
+                      let valueToExtract;
+                      if (field === "July" || field === "June" || field === "May") {
+                        valueToExtract = r[field];
+                      } else {
+                        valueToExtract = r[field.toLowerCase()];
+                      }
+                      if (valueToExtract) {
+                        uniqueValues.add(valueToExtract);
+                      }
+                    });
+
+                    return [...uniqueValues].sort().map((value) => (
+                      <MenuItem key={value} value={value}>{value}</MenuItem>
+                    ));
+                  })()}
                 </Select>
               </FormControl>
             ))}
             <TextField
-              label="Search Client_ID"
+              label="Search_ID / PPPoE_Name" // Updated label for clarity
               variant="outlined"
               size="small"
-              sx={{ minWidth: 100, maxWidth: 150 }}
+              sx={{ minWidth: 150, maxWidth: 250 }}
               value={searchId}
               onChange={(e) => {
                 const val = e.target.value;
                 setSearchId(val);
-                applyFilters(filter, val); // Ensure filter state is passed
+                applyFilters(filter, val);
               }}
             />
-              <TextField
-              label="Search Mobile_No"
-              variant="outlined"
-              size="small"
-              sx={{ minWidth: 100, maxWidth: 200 }}
-              value={MobileNo}
-              onChange={(e) => {
-                const val = e.target.value;
-                setMobileNo(val);
-                applyFilters(filter, val); // Ensure filter state is passed
-              }}
-            />
-        <TextField
-              label="Search PPPoE_Name"
-              variant="outlined"
-              size="small"
-              sx={{ minWidth: 100, maxWidth: 200 }}
-              value={PPPoEName}
-              onChange={(e) => {
-                const val = e.target.value;
-                setPPPoEName(val);
-                applyFilters(filter, val); // Ensure filter state is passed
-              }}
-        />
           </Box>
 
           <TableContainer component={Paper}>
@@ -270,8 +262,8 @@ function App() {
                   <StyledTableCell>SL_No</StyledTableCell>
                   <StyledTableCell>Client_ID</StyledTableCell>
                   <StyledTableCell>PPPoE_Name</StyledTableCell>
-                  <StyledTableCell>Area</StyledTableCell>
-                  <StyledTableCell>Mobile</StyledTableCell>
+                  <StyledTableCell>Area_Name</StyledTableCell>
+                  <StyledTableCell>Mobile_No</StyledTableCell>
                   <StyledTableCell>July</StyledTableCell>
                   <StyledTableCell>June</StyledTableCell>
                   <StyledTableCell>May</StyledTableCell>
