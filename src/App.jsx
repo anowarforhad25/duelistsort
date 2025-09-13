@@ -101,7 +101,7 @@ function App() {
         // --- Start: Only Mathematical Logic is Changed as per your request ---
         
         const balance = parseFloat(row.balance || 0);
-        const selling_bdt = 500;
+        const selling_bdt = parseFloat(row.selling_bdt || 0);
         let total_due;
 
         if (balance < 0) {
