@@ -51,8 +51,8 @@ const fetchSheet = async (sheetId, sheetName) => {
 function App() {
   const [results, setResults] = useState([]);
   const [filteredResults, setFilteredResults] = useState([]);
-  const [filter, setFilter] = useState({ August: "", July: "", June: "", Area: "", Balance: "" });
-  const [summary, setSummary] = useState({ August: 0, July: 0, June: 0 });
+  const [filter, setFilter] = useState({ September: "", August: "", July: "", Area: "", Balance: "" });
+  const [summary, setSummary] = useState({ September: 0, August: 0, July: 0 });
   const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [page, setPage] = useState(0);
@@ -111,9 +111,9 @@ function App() {
           PPPoE_Name,
           area,
           client_phone,
-          August: "No Payment",
-          July: sheet2Ids.has(customer_id) ? "No Payment" : "Payment",
-          June: sheet3Ids.has(customer_id) ? "No Payment" : "Payment",
+          September: "No Payment",
+          August: sheet2Ids.has(customer_id) ? "No Payment" : "Payment",
+          July: sheet3Ids.has(customer_id) ? "No Payment" : "Payment",
           totalCount:
             1 +
             (sheet2Ids.has(customer_id) ? 1 : 0) +
@@ -126,9 +126,9 @@ function App() {
       setFilteredResults(final);
 
       const summaryStats = {
-        August: final.length,
+        September: final.length,
+        August: final.filter((r) => r.August === "No Payment").length,
         July: final.filter((r) => r.July === "No Payment").length,
-        June: final.filter((r) => r.June === "No Payment").length,
       };
       setSummary(summaryStats);
     } catch (err) {
@@ -146,9 +146,9 @@ function App() {
   const applyFilters = (updatedFilter, searchText) => {
     const filtered = results.filter(
       (row) =>
+        (!updatedFilter.September || row.September === updatedFilter.September) &&
         (!updatedFilter.August || row.August === updatedFilter.August) &&
         (!updatedFilter.July || row.July === updatedFilter.July) &&
-        (!updatedFilter.June || row.June === updatedFilter.June) &&
         (!updatedFilter.Area || (row.area && row.area.toLowerCase() === updatedFilter.Area.toLowerCase())) &&
         (!updatedFilter.Balance || (row.balance && row.balance.toLowerCase() === updatedFilter.Balance.toLowerCase())) &&
         // --- START: MODIFIED CODE FOR ENHANCED SEARCH ---
@@ -195,9 +195,9 @@ function App() {
 
         <Box sx={{ px: { xs: 1, sm: 2, md: 3 }, py: 2, minHeight: "100vh" }}>
           <Box mb={2} display="flex" justifyContent="center" gap={4}>
+            <Typography variant="subtitle1">September No Payment: {summary.September}</Typography>
             <Typography variant="subtitle1">August No Payment: {summary.August}</Typography>
             <Typography variant="subtitle1">July No Payment: {summary.July}</Typography>
-            <Typography variant="subtitle1">June No Payment: {summary.June}</Typography>
           </Box>
 
           <Box mb={2} display="flex" justifyContent="center">
@@ -207,7 +207,7 @@ function App() {
           </Box>
 
           <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={2}>
-            {["August", "July", "June", "Area", "Balance"].map((field) => (
+            {["September", "August", "July", "Area", "Balance"].map((field) => (
               <FormControl key={field} sx={{ minWidth: 120 }} size="small">
                 <InputLabel>{field}</InputLabel>
                 <Select
@@ -218,14 +218,14 @@ function App() {
                   <MenuItem value="">All</MenuItem>
                   {(() => {
                     let uniqueValues = new Set();
-                    if (field === "August" || field === "July" || field === "June") {
+                    if (field === "September" || field === "August" || field === "July") {
                       uniqueValues.add("No Payment");
                       uniqueValues.add("Payment");
                     }
 
                     results.forEach(r => {
                       let valueToExtract;
-                      if (field === "August" || field === "July" || field === "June") {
+                      if (field === "September" || field === "August" || field === "July") {
                         valueToExtract = r[field];
                       } else {
                         valueToExtract = r[field.toLowerCase()];
@@ -265,9 +265,9 @@ function App() {
                   <StyledTableCell>PPPoE_Name</StyledTableCell>
                   <StyledTableCell>Area_Name</StyledTableCell>
                   <StyledTableCell>Mobile_No</StyledTableCell>
+                  <StyledTableCell>September</StyledTableCell>
                   <StyledTableCell>August</StyledTableCell>
                   <StyledTableCell>July</StyledTableCell>
-                  <StyledTableCell>June</StyledTableCell>
                   <StyledTableCell>Count</StyledTableCell>
                   <StyledTableCell>Total_Due</StyledTableCell>
                 </TableRow>
@@ -283,9 +283,9 @@ function App() {
                         <TableCell>{row.PPPoE_Name}</TableCell>
                         <TableCell>{row.area}</TableCell>
                         <TableCell>{row.client_phone}</TableCell>
+                        <TableCell sx={{ color: row.September === "No Payment" ? "error.main" : "success.main" }}>{row.September}</TableCell>
                         <TableCell sx={{ color: row.August === "No Payment" ? "error.main" : "success.main" }}>{row.August}</TableCell>
                         <TableCell sx={{ color: row.July === "No Payment" ? "error.main" : "success.main" }}>{row.July}</TableCell>
-                        <TableCell sx={{ color: row.June === "No Payment" ? "error.main" : "success.main" }}>{row.June}</TableCell>
                         <TableCell>{row.totalCount}</TableCell>
                         <TableCell>{row.balance}</TableCell>
                       </AnimatedRow>
@@ -318,9 +318,9 @@ function App() {
                         {selectedRow.client_phone}
                       </Link>
                     </p>
+                    <p><strong>September:</strong> {selectedRow.September}</p>
                     <p><strong>August:</strong> {selectedRow.August}</p>
                     <p><strong>July:</strong> {selectedRow.July}</p>
-                    <p><strong>June:</strong> {selectedRow.June}</p>
                     <p><strong>Count:</strong> {selectedRow.totalCount}</p>
                     <p><strong>Total Due:</strong> {selectedRow.balance}</p>
                   </DialogContentText>
