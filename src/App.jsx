@@ -97,13 +97,20 @@ function App() {
         const PPPoE_Name = row.PPPoE_Name || "-";
         const area = row.area || "-";
         const client_phone = row.client_phone || "";
-        let balance = parseFloat(row.balance || 0);
+
+        // --- Start: Only Mathematical Logic is Changed as per your request ---
+        
+        const balance = parseFloat(row.balance || 0);
+        const selling_bdt = 500;
+        let total_due;
 
         if (balance < 0) {
-          balance = Math.abs(balance) + 500;
+          total_due = Math.abs(balance) + selling_bdt;
         } else {
-          balance = 500 - balance;
+          total_due = selling_bdt - balance;
         }
+        
+        // --- End: Mathematical Logic Change ---
 
         return {
           serial: index + 1,
@@ -118,7 +125,7 @@ function App() {
             1 +
             (sheet2Ids.has(customer_id) ? 1 : 0) +
             (sheet3Ids.has(customer_id) ? 1 : 0),
-          balance: `${parseInt(balance)} TK`,
+          balance: `${parseInt(total_due)} TK`,
         };
       });
 
