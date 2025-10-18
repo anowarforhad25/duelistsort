@@ -329,8 +329,9 @@ function App() {
                       <strong>WhatsApp:</strong>{" "}
                       {(() => {
                         const phone = selectedRow.client_phone;
-                        // Use 880 for the country code, assuming Bangladeshi numbers (01xxxx)
-                        const waNumber = phone.startsWith('0') ? '88' + phone.substring(1) : phone.startsWith('880') ? phone : '880' + phone;
+                        // For wa.me links, it's safer to include the country code (e.g., 880 for Bangladesh)
+                        // This logic assumes the phone numbers are local (e.g., 01xxxxxxxxx) and prepends '88'
+                        const waNumber = phone.startsWith('0') ? '88' + phone : '880' + phone;
 
                         // Construct the personalized, multi-line message template
                         const name = selectedRow.PPPoE_Name || 'Valued Customer';
