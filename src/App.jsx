@@ -324,28 +324,40 @@ function App() {
                         {selectedRow.client_phone}
                       </Link>
                     </p>
-					{/* START: Added WhatsApp Link */}
+					{/* START: Updated WhatsApp Link with Bill Notification Template */}
                     <p>
                       <strong>WhatsApp:</strong>{" "}
                       {(() => {
                         const phone = selectedRow.client_phone;
-                        // For wa.me links, it's safer to include the country code (e.g., 880 for Bangladesh)
-                        // This logic assumes the phone numbers are local (e.g., 01xxxxxxxxx) and prepends '88'
-                        const waNumber = phone.startsWith('0') ? '88' + phone : '880' + phone;
+                        // Use 880 for the country code, assuming Bangladeshi numbers (01xxxx)
+                        const waNumber = phone.startsWith('0') ? '88' + phone.substring(1) : phone.startsWith('880') ? phone : '880' + phone;
+
+                        // Construct the personalized, multi-line message template
+                        const name = selectedRow.PPPoE_Name || 'Valued Customer';
+                        const amount = selectedRow.balance || '0 TK';
+                        
+                        // Use \n for newlines
+                        const message = `Dear ${name},\n\nYour current total due amount is ${amount}.\nPlease pay your outstanding bill as soon as possible.\n\nThank you.`;
+                        
+                        // 1. URL-encode the message
+                        let encodedMessage = encodeURIComponent(message);
+
+                        // 2. Explicitly replace '+' (standard space encoding) with %20, 
+                        // as '+' can sometimes cause issues in WhatsApp desktop/web clients
+                        encodedMessage = encodedMessage.replace(/\+/g, '%20');
 
                         return (
                           <Link 
-                            href={`https://wa.me/${waNumber}`} 
+                            href={`https://wa.me/${waNumber}?text=${encodedMessage}`} 
                             underline="hover" 
                             color="secondary" 
                             target="_blank"
                           >
-                            Chat on WhatsApp
+                            Send Notification
                           </Link>
                         );
                       })()}
                     </p>
-                    {/* END: Added WhatsApp Link */}
                     <p><strong>October:</strong> {selectedRow.October}</p>
                     <p><strong>September:</strong> {selectedRow.September}</p>
                     <p><strong>August:</strong> {selectedRow.August}</p>
