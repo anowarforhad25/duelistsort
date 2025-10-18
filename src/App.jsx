@@ -383,11 +383,10 @@ function App() {
             <Typography variant="subtitle1">October No Payment: {summary.October}</Typography>
             <Typography variant="subtitle1">September No Payment: {summary.September}</Typography>
             <Typography variant="subtitle1">August No Payment: {summary.August}</Typography>
-			  <br>            {/* BUTTON TEXT REVERTED TO WHATSAPP LINKS */}
+			  {/* BUTTON TEXT REVERTED TO WHATSAPP LINKS */}
             <Button variant="contained" color="secondary" onClick={handleGenerateBulkLinks} sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 2, sm: 0 } }}>
               Generate Bulk WhatsApp Links
             </Button>
-				  </br>
           </Box>
 
           <Box mb={2} display="flex" justifyContent="center">
