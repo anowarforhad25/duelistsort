@@ -324,6 +324,28 @@ function App() {
                         {selectedRow.client_phone}
                       </Link>
                     </p>
+					{/* START: Added WhatsApp Link */}
+                    <p>
+                      <strong>WhatsApp:</strong>{" "}
+                      {(() => {
+                        const phone = selectedRow.client_phone;
+                        // For wa.me links, it's safer to include the country code (e.g., 880 for Bangladesh)
+                        // This logic assumes the phone numbers are local (e.g., 01xxxxxxxxx) and prepends '88'
+                        const waNumber = phone.startsWith('0') ? '88' + phone : '880' + phone;
+
+                        return (
+                          <Link 
+                            href={`https://wa.me/${waNumber}`} 
+                            underline="hover" 
+                            color="secondary" 
+                            target="_blank"
+                          >
+                            Chat on WhatsApp
+                          </Link>
+                        );
+                      })()}
+                    </p>
+                    {/* END: Added WhatsApp Link */}
                     <p><strong>October:</strong> {selectedRow.October}</p>
                     <p><strong>September:</strong> {selectedRow.September}</p>
                     <p><strong>August:</strong> {selectedRow.August}</p>
