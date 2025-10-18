@@ -334,11 +334,11 @@ function App() {
                         const waNumber = phone.startsWith('0') ? '88' + phone : '880' + phone;
 
                         // Construct the personalized, multi-line message template
-                        const name = selectedRow.PPPoE_Name || 'Valued Customer';
+                        //const name = selectedRow.PPPoE_Name || 'Valued Customer';
                         const amount = selectedRow.balance || '0 TK';
                         
                         // Use \n for newlines
-                        const message = `Dear ${name},\n\nYour current total due amount is ${amount}.\nPlease pay your outstanding bill as soon as possible.\n\nThank you.`;
+                        const message = `Dear Client,\n\nYour current total due amount is ${amount}.\nPlease pay your outstanding bill as soon as possible.\n\nThank you.`;
                         
                         // 1. URL-encode the message
                         let encodedMessage = encodeURIComponent(message);
