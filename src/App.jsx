@@ -314,6 +314,9 @@ function App() {
 
     // DEBUGGING DISPLAY & VALIDATION
     const DebugLine = (
+        <Typography variant="caption" display="block" color={isValid ? "success.main" : "error.main"}>
+            Sanitized Number: <strong>{sanitizedPhone || 'Invalid'}</strong>
+        </Typography>
     );
 
     if (!isValid) {
@@ -352,6 +355,9 @@ function App() {
                 Send WhatsApp
             </Button>
             {DebugLine}
+            <Typography variant="caption" display="block" color="textSecondary">
+                *Opens in a new window/app with a pre-filled message.
+            </Typography>
         </>
     );
   };
@@ -533,6 +539,9 @@ function App() {
                 <Typography variant="body2" color="success.main" gutterBottom>
                     This list contains direct **WhatsApp links** for all {bulkNotificationList.length} customers with outstanding dues.
                 </Typography>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                    Clicking **"Open WhatsApp"** for each entry will open a new tab/app with the customer's number and a pre-filled reminder message.
+                </Typography>
                 <Paper elevation={1} style={{ maxHeight: '60vh', overflowY: 'auto', padding: '10px' }}>
                   {bulkNotificationList.map((item, index) => (
                     <Box 
@@ -563,6 +572,11 @@ function App() {
                         >
                           Open WhatsApp
                         </Button>
+                      </Box>
+                      <Typography variant="caption" color="textSecondary" sx={{ mt: 0.5, fontStyle: 'italic', maxWidth: '100%', overflowWrap: 'break-word' }}>
+                          Message Content Preview: {item.messageContent}
+                      </Typography>
+                    </Box>
                   ))}
                   {bulkNotificationList.length === 0 && (
                       <Typography variant="body1" align="center" sx={{ py: 4, color: 'text.secondary' }}>
