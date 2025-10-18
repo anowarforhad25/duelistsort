@@ -513,17 +513,16 @@ function App() {
     const whatsappLink = `https://wa.me/${sanitizedPhone}?text=${encodedMessage}`;
 
     return (
-        <Link 
-            component="a" 
-            href={whatsappLink}
-            target="_blank" // CRITICAL: Ensures it opens a new tab/app, not the current Canvas window.
-            rel="noopener noreferrer"
-            color="secondary" // Use secondary color to simulate the purple link color
-            sx={{ fontWeight: 'bold' }}
-            underline="hover"
+        <Button 
+            variant="contained" 
+            color="success" // Use success color for the WhatsApp button
+            size="small"
+            // *** FIX: Use onClick with window.open for reliable tab opening ***
+            onClick={() => window.open(whatsappLink, '_blank')}
+            sx={{ mt: 1, textTransform: 'none', fontWeight: 'bold' }}
         >
-            Send Notification
-        </Link>
+            Send Notification via WhatsApp
+        </Button>
     );
   };
 
@@ -560,14 +559,27 @@ function App() {
             </Typography>
           </Box>
           
-          {/* Total Records and Bulk Link Button / Loading Indicator */}
+          {/* Total Records (Boxed) and Bulk Link Button / Loading Indicator */}
           <Box mb={2} display="flex" justifyContent={{ xs: 'center', md: 'space-between' }} alignItems="center" flexWrap="wrap" gap={2}>
-            <Box display="flex" alignItems="center" gap={2}>
-                <Typography variant="h6" color="primary" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
-                  Total Records: {filteredResults.length}
+            
+            {/* Total Records Box */}
+            <Paper elevation={3} sx={{ 
+                p: 1.5, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1, 
+                minWidth: { xs: 'auto', sm: 200 } 
+            }}>
+                <Typography variant="h6" color="primary" sx={{ 
+                    fontSize: { xs: '1rem', sm: '1.25rem' }, 
+                    whiteSpace: 'nowrap' 
+                }}>
+                  Total Records: <Box component="span" fontWeight="bold">{filteredResults.length}</Box>
                 </Typography>
                 {isLoading && <CircularProgress size={24} />}
-            </Box>
+            </Paper>
+
+            {/* Bulk Link Button */}
             <Button 
               variant="contained" 
               color="secondary" 
@@ -720,8 +732,6 @@ function App() {
                     <Typography
                       component="span"
                       onClick={(e) => {
-                        // Crucial step: Prevent the default behavior which the Canvas environment intercepts.
-                        e.stopPropagation(); 
                         // Manually open the tel: protocol in a new window/tab
                         window.open(`tel:${selectedRow.client_phone}`, '_blank');
                       }}
@@ -735,14 +745,6 @@ function App() {
                     >
                       {selectedRow.client_phone}
                     </Typography>
-                  </p>  
-                  <p>
-                    <strong>WhatsApp Message:</strong>{" "}
-                    {/* If customMessage exists, use it; otherwise, use the default message */}
-                    <WhatsAppLinkSection 
-                        selectedRow={selectedRow} 
-                        messageContent={customMessage || getDefaultMessage(selectedRow)}
-                    />
                   </p>
                   <p><strong>October:</strong> <Box component="span" color={selectedRow.October === "No Payment" ? "error.main" : "success.main"}>{selectedRow.October}</Box></p>
                   <p><strong>September:</strong> <Box component="span" color={selectedRow.September === "No Payment" ? "error.main" : "success.main"}>{selectedRow.September}</Box></p>
@@ -750,6 +752,14 @@ function App() {
                   <p><strong>Count:</strong> <Box component="span" fontWeight="bold">{selectedRow.totalCount}</Box></p>
                   {/* Display the calculated Total Due */}
                   <p><strong>Total Due:</strong> <Box component="span" fontWeight="bold" color="warning.main">{selectedRow.balance}</Box></p>
+                  
+                  <Box mt={2}>
+                    {/* *** FIX APPLIED HERE: Using WhatsAppLinkSection for reliable button click *** */}
+                    <WhatsAppLinkSection 
+                        selectedRow={selectedRow} 
+                        messageContent={customMessage || getDefaultMessage(selectedRow)}
+                    />
+                  </Box>
                 </DialogContentText>
               )}
             </DialogContent>
@@ -791,17 +801,15 @@ function App() {
                     <Typography variant="body2" sx={{ flexGrow: 1, pr: 2, order: { xs: 1, sm: 1 } }}>
                       <Box component="span" fontWeight="bold">{item.name}</Box> ({item.phone})
                     </Typography>
+                    {/* *** FIX APPLIED HERE: Use onClick with window.open for reliable tab opening *** */}
                     <Button 
-                      component="a"
-                      href={item.link}
-                      target="_blank" // CRITICAL: Ensures it opens a new tab/app.
-                      rel="noopener noreferrer"
+                      onClick={() => window.open(item.link, '_blank')}
                       size="small" 
                       variant="contained"
                       color="success"
                       sx={{ flexShrink: 0, order: { xs: 3, sm: 2 } }}
                     >
-                      Send via WhatsApp
+                      Open WhatsApp
                     </Button>
                     <Typography 
                         variant="caption" 
