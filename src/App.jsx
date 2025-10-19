@@ -463,7 +463,7 @@ function App() {
           }}
         >
           <Paper elevation={3} sx={{ p: 4, borderRadius: 2, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 300 }}>
-            <Typography variant="h5" align="center">Customer Dashboard Login</Typography>
+            <Typography variant="h5" align="center">Dashboard Login</Typography>
             <TextField 
               label="Username" 
               value={loginInfo.username} 
@@ -591,7 +591,7 @@ function App() {
                 whiteSpace: 'nowrap'
               }}
             >
-              Generate Bulk WhatsApp Links
+          WhatsApp Bulk Open
             </Button>
           </Box>
 
