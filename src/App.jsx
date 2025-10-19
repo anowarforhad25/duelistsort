@@ -809,7 +809,7 @@ function App() {
                       color="success"
                       sx={{ flexShrink: 0, order: { xs: 3, sm: 2 } }}
                     >
-                      Open WhatsApp
+                      Send WhatsApp
                     </Button>
                     <Typography 
                         variant="caption" 
