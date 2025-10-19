@@ -99,10 +99,10 @@ const sanitizePhoneForWhatsApp = (phone) => {
  * Generates the default, fixed collection message.
  */
 const getDefaultMessage = (row) => {
-    const name = row.PPPoE_Name || 'Valued Client';
+    //const name = row.PPPoE_Name || 'Valued Client';
     // Use the calculated balance stored in the 'balance' field (e.g., "1500 TK")
     const amount = row.balance || '0 TK'; 
-    return `Dear ${name}. This is a reminder that your total outstanding due amount is ${amount}. Kindly complete the payment as soon as possible to ensure uninterrupted service. Thank you for your cooperation. [Your Company Name/Ref.]`;
+    return `প্রিয় গ্রাহক, আপনাকে জানানো যাচ্ছে যে আপনার মোট বকেয়ার পরিমাণ ${amount}. নিরবচ্ছিন্ন সংযোগ নিশ্চিত করতে দ্রুত পেমেন্ট সম্পন্ন করুন। আপনার সহযোগিতার জন্য ধন্যবাদ। -ফরহাদনগর ব্রডব্যান্ড ইন্টারনেট`;
 };
 
 function App() {
