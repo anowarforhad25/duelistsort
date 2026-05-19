@@ -108,8 +108,8 @@ const getDefaultMessage = (row) => {
 function App() {
   const [results, setResults] = useState([]);
   const [filteredResults, setFilteredResults] = useState([]);
-  const [filter, setFilter] = useState({ April: "", March: "", February: "", Area: "", Balance: "" });
-  const [summary, setSummary] = useState({ April: 0, March: 0, February: 0 });
+  const [filter, setFilter] = useState({ Running: "", Previous: "", Last Previous: "", Area: "", Balance: "" });
+  const [summary, setSummary] = useState({ Running: 0, Previous: 0, Last Previous: 0 });
   const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [page, setPage] = useState(0);
@@ -222,11 +222,11 @@ function App() {
         const final_due_amount = Math.max(0, total_due);
 
         // Determine if payment was "No Payment" (true means no payment)
-        const isAprilDue = true; // Always assume current month due for this report
-        const isMarchDue = sheet2Ids.has(customer_id);
-        const isFebruaryDue = sheet3Ids.has(customer_id);
+        const isRunningDue = true; // Always assume current month due for this report
+        const isPreviousDue = sheet2Ids.has(customer_id);
+        const isLast PreviousDue = sheet3Ids.has(customer_id);
 
-        const totalCount = (isAprilDue ? 1 : 0) + (isMarchDue ? 1 : 0) + (isFebruaryDue ? 1 : 0);
+        const totalCount = (isRunningDue ? 1 : 0) + (isPreviousDue ? 1 : 0) + (isLast PreviousDue ? 1 : 0);
         
         return {
           serial: index + 1,
@@ -234,9 +234,9 @@ function App() {
           PPPoE_Name,
           area,
           client_phone,
-          April: isAprilDue ? "No Payment" : "Payment",
-          March: isMarchDue ? "No Payment" : "Payment",
-          February: isFebruaryDue ? "No Payment" : "Payment",
+          Running: isRunningDue ? "No Payment" : "Payment",
+          Previous: isPreviousDue ? "No Payment" : "Payment",
+          Last Previous: isLast PreviousDue ? "No Payment" : "Payment",
           totalCount: totalCount,
           // Store the calculated, formatted due amount
           balance: `${parseInt(final_due_amount)} TK`, 
@@ -250,9 +250,9 @@ function App() {
 
       // Calculate summary statistics
       const summaryStats = {
-        April: final.filter((r) => r.April === "No Payment").length,
-        March: final.filter((r) => r.March === "No Payment").length,
-        February: final.filter((r) => r.February === "No Payment").length,
+        Running: final.filter((r) => r.Running === "No Payment").length,
+        Previous: final.filter((r) => r.Previous === "No Payment").length,
+        Last Previous: final.filter((r) => r.Last Previous === "No Payment").length,
       };
       setSummary(summaryStats);
       showSnackbar("Data loaded successfully!", "success");
@@ -275,9 +275,9 @@ function App() {
     setCustomMessage(""); // Clear previous message
     
     const overdueMonths = [
-        row.April === "No Payment" && "April",
-        row.March === "No Payment" && "March",
-        row.February === "No Payment" && "February",
+        row.Running === "No Payment" && "Running",
+        row.Previous === "No Payment" && "Previous",
+        row.Last Previous === "No Payment" && "Last Previous",
     ].filter(Boolean);
     
     const dueStatusText = overdueMonths.length > 0 ? 
@@ -383,7 +383,7 @@ function App() {
   
   /**
    * Handles changes in filter dropdowns.
-   * @param {string} field - The filter field (e.g., "February", "Area").
+   * @param {string} field - The filter field (e.g., "Last Previous", "Area").
    * @param {string} value - The selected filter value.
    */
   const handleFilterChange = (field, value) => {
@@ -400,9 +400,9 @@ function App() {
   const applyFilters = (updatedFilter, searchText) => {
     const filtered = results.filter(
       (row) =>
-        (!updatedFilter.April || row.April === updatedFilter.April) &&
-        (!updatedFilter.March || row.March === updatedFilter.March) &&
-        (!updatedFilter.February || row.February === updatedFilter.February) &&
+        (!updatedFilter.Running || row.Running === updatedFilter.Running) &&
+        (!updatedFilter.Previous || row.Previous === updatedFilter.Previous) &&
+        (!updatedFilter.Last Previous || row.Last Previous === updatedFilter.Last Previous) &&
         (!updatedFilter.Area || (row.area && row.area.toLowerCase() === updatedFilter.Area.toLowerCase())) &&
         (!updatedFilter.Balance || (row.balance && row.balance.toLowerCase() === updatedFilter.Balance.toLowerCase())) &&
         (!searchText ||
@@ -549,13 +549,13 @@ function App() {
           {/* Summary and Bulk WhatsApp Link Button (Combined and Aligned) */}
           <Box mb={4} display="flex" justifyContent="center" gap={{ xs: 2, sm: 4 }} flexWrap="wrap" alignItems="center">
             <Typography variant="subtitle1" component="span" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-              April No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.April}</Box>
+              Running No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Running}</Box>
             </Typography>
             <Typography variant="subtitle1" component="span" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-              March No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.March}</Box>
+              Previous No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Previous}</Box>
             </Typography>
             <Typography variant="subtitle1" component="span" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-              February No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.February}</Box>
+              Last Previous No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Last Previous}</Box>
             </Typography>
           </Box>
           
@@ -599,7 +599,7 @@ function App() {
           <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={2} sx={{ 
             '& .MuiFormControl-root, & .MuiTextField-root': { minWidth: { xs: '45%', sm: 140 } } 
           }}>
-            {["April", "March", "February", "Area", "Balance"].map((field) => (
+            {["Running", "Previous", "Last Previous", "Area", "Balance"].map((field) => (
               <FormControl key={field} sx={{ minWidth: 120 }} size="small">
                 <InputLabel>{field}</InputLabel>
                 <Select
@@ -610,14 +610,14 @@ function App() {
                   <MenuItem value="">All</MenuItem>
                   {(() => {
                     let uniqueValues = new Set();
-                    if (field === "April" || field === "March" || field === "February") {
+                    if (field === "Running" || field === "Previous" || field === "Last Previous") {
                       uniqueValues.add("No Payment");
                       uniqueValues.add("Payment");
                     }
 
                     results.forEach(r => {
                       let valueToExtract;
-                      if (field === "April" || field === "March" || field === "February") {
+                      if (field === "Running" || field === "Previous" || field === "Last Previous") {
                         valueToExtract = r[field];
                       } else {
                         // Use .toLowerCase() to match the filtering logic for Area/Balance
@@ -659,9 +659,9 @@ function App() {
                   <StyledTableCell>PPPoE_Name</StyledTableCell>
                   <StyledTableCell>Area_Name</StyledTableCell>
                   <StyledTableCell>Mobile_No</StyledTableCell>
-                  <StyledTableCell>April</StyledTableCell>
-                  <StyledTableCell>March</StyledTableCell>
-                  <StyledTableCell>February</StyledTableCell>
+                  <StyledTableCell>Running</StyledTableCell>
+                  <StyledTableCell>Previous</StyledTableCell>
+                  <StyledTableCell>Last Previous</StyledTableCell>
                   <StyledTableCell>Count</StyledTableCell>
                   <StyledTableCell>Total_Due</StyledTableCell>
                 </TableRow>
@@ -679,9 +679,9 @@ function App() {
                         <TableCell>{row.area}</TableCell>
                         <TableCell>{row.client_phone}</TableCell>
                         {/* Conditional color for payment status */}
-                        <TableCell sx={{ color: row.April === "No Payment" ? "error.main" : "success.main" }}>{row.April}</TableCell>
-                        <TableCell sx={{ color: row.March === "No Payment" ? "error.main" : "success.main" }}>{row.March}</TableCell>
-                        <TableCell sx={{ color: row.February === "No Payment" ? "error.main" : "success.main" }}>{row.February}</TableCell>
+                        <TableCell sx={{ color: row.Running === "No Payment" ? "error.main" : "success.main" }}>{row.Running}</TableCell>
+                        <TableCell sx={{ color: row.Previous === "No Payment" ? "error.main" : "success.main" }}>{row.Previous}</TableCell>
+                        <TableCell sx={{ color: row.Last Previous === "No Payment" ? "error.main" : "success.main" }}>{row.Last Previous}</TableCell>
                         <TableCell>{row.totalCount}</TableCell>
                         {/* Display the newly calculated Total Due */}
                         <TableCell>{row.balance}</TableCell>
@@ -746,9 +746,9 @@ function App() {
                       {selectedRow.client_phone}
                     </Typography>
                   </p>
-                  <p><strong>April:</strong> <Box component="span" color={selectedRow.April === "No Payment" ? "error.main" : "success.main"}>{selectedRow.April}</Box></p>
-                  <p><strong>March:</strong> <Box component="span" color={selectedRow.March === "No Payment" ? "error.main" : "success.main"}>{selectedRow.March}</Box></p>
-                  <p><strong>February:</strong> <Box component="span" color={selectedRow.February === "No Payment" ? "error.main" : "success.main"}>{selectedRow.February}</Box></p>
+                  <p><strong>Running:</strong> <Box component="span" color={selectedRow.Running === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Running}</Box></p>
+                  <p><strong>Previous:</strong> <Box component="span" color={selectedRow.Previous === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Previous}</Box></p>
+                  <p><strong>Last Previous:</strong> <Box component="span" color={selectedRow.Last Previous === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Last Previous}</Box></p>
                   <p><strong>Count:</strong> <Box component="span" fontWeight="bold">{selectedRow.totalCount}</Box></p>
                   {/* Display the calculated Total Due */}
                   <p><strong>Total Due:</strong> <Box component="span" fontWeight="bold" color="warning.main">{selectedRow.balance}</Box></p>
