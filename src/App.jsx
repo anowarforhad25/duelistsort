@@ -108,8 +108,8 @@ const getDefaultMessage = (row) => {
 function App() {
   const [results, setResults] = useState([]);
   const [filteredResults, setFilteredResults] = useState([]);
-  const [filter, setFilter] = useState({ Running_Month: "", Previous_Month: "", Last_Previous_Month_Month_Month: "", Area: "", Balance: "" });
-  const [summary, setSummary] = useState({ Running_Month: 0, Previous_Month: 0, Last_Previous_Month_Month_Month: 0 });
+  const [filter, setFilter] = useState({ Running_Month: "", Previous_Month: "", Last_Previous_Month: "", Area: "", Balance: "" });
+  const [summary, setSummary] = useState({ Running_Month: 0, Previous_Month: 0, Last_Previous_Month: 0 });
   const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [page, setPage] = useState(0);
@@ -224,9 +224,9 @@ function App() {
         // Determine if payment was "No Payment" (true means no payment)
         const isRunning_MonthDue = true; // Always assume current month due for this report
         const isPrevious_MonthDue = sheet2Ids.has(customer_id);
-        const isLast_Previous_Month_Month_MonthDue = sheet3Ids.has(customer_id);
+        const isLast_Previous_MonthDue = sheet3Ids.has(customer_id);
 
-        const totalCount = (isRunning_MonthDue ? 1 : 0) + (isPrevious_MonthDue ? 1 : 0) + (isLast_Previous_Month_Month_MonthDue ? 1 : 0);
+        const totalCount = (isRunning_MonthDue ? 1 : 0) + (isPrevious_MonthDue ? 1 : 0) + (isLast_Previous_MonthDue ? 1 : 0);
         
         return {
           serial: index + 1,
@@ -236,7 +236,7 @@ function App() {
           client_phone,
           Running_Month: isRunning_MonthDue ? "No Payment" : "Payment",
           Previous_Month: isPrevious_MonthDue ? "No Payment" : "Payment",
-          Last_Previous_Month_Month_Month: isLast_Previous_Month_Month_MonthDue ? "No Payment" : "Payment",
+          Last_Previous_Month: isLast_Previous_MonthDue ? "No Payment" : "Payment",
           totalCount: totalCount,
           // Store the calculated, formatted due amount
           balance: `${parseInt(final_due_amount)} TK`, 
@@ -252,7 +252,7 @@ function App() {
       const summaryStats = {
         Running_Month: final.filter((r) => r.Running_Month === "No Payment").length,
         Previous_Month: final.filter((r) => r.Previous_Month === "No Payment").length,
-        Last_Previous_Month_Month_Month: final.filter((r) => r.Last_Previous_Month_Month_Month === "No Payment").length,
+        Last_Previous_Month: final.filter((r) => r.Last_Previous_Month === "No Payment").length,
       };
       setSummary(summaryStats);
       showSnackbar("Data loaded successfully!", "success");
@@ -277,7 +277,7 @@ function App() {
     const overdueMonths = [
         row.Running_Month === "No Payment" && "Running_Month",
         row.Previous_Month === "No Payment" && "Previous_Month",
-        row.Last_Previous_Month_Month_Month === "No Payment" && "Last_Previous_Month_Month_Month",
+        row.Last_Previous_Month === "No Payment" && "Last_Previous_Month",
     ].filter(Boolean);
     
     const dueStatusText = overdueMonths.length > 0 ? 
@@ -383,7 +383,7 @@ function App() {
   
   /**
    * Handles changes in filter dropdowns.
-   * @param {string} field - The filter field (e.g., "Last_Previous_Month_Month_Month", "Area").
+   * @param {string} field - The filter field (e.g., "Last_Previous_Month", "Area").
    * @param {string} value - The selected filter value.
    */
   const handleFilterChange = (field, value) => {
@@ -402,7 +402,7 @@ function App() {
       (row) =>
         (!updatedFilter.Running_Month || row.Running_Month === updatedFilter.Running_Month) &&
         (!updatedFilter.Previous_Month || row.Previous_Month === updatedFilter.Previous_Month) &&
-        (!updatedFilter.Last_Previous_Month_Month_Month || row.Last_Previous_Month_Month_Month === updatedFilter.Last_Previous_Month_Month_Month) &&
+        (!updatedFilter.Last_Previous_Month || row.Last_Previous_Month === updatedFilter.Last_Previous_Month) &&
         (!updatedFilter.Area || (row.area && row.area.toLowerCase() === updatedFilter.Area.toLowerCase())) &&
         (!updatedFilter.Balance || (row.balance && row.balance.toLowerCase() === updatedFilter.Balance.toLowerCase())) &&
         (!searchText ||
@@ -555,7 +555,7 @@ function App() {
               Previous_Month No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Previous_Month}</Box>
             </Typography>
             <Typography variant="subtitle1" component="span" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-              Last_Previous_Month_Month_Month No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Last_Previous_Month_Month_Month}</Box>
+              Last_Previous_Month No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Last_Previous_Month}</Box>
             </Typography>
           </Box>
           
@@ -599,7 +599,7 @@ function App() {
           <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={2} sx={{ 
             '& .MuiFormControl-root, & .MuiTextField-root': { minWidth: { xs: '45%', sm: 140 } } 
           }}>
-            {["Running_Month", "Previous_Month", "Last_Previous_Month_Month_Month", "Area", "Balance"].map((field) => (
+            {["Running_Month", "Previous_Month", "Last_Previous_Month", "Area", "Balance"].map((field) => (
               <FormControl key={field} sx={{ minWidth: 120 }} size="small">
                 <InputLabel>{field}</InputLabel>
                 <Select
@@ -610,14 +610,14 @@ function App() {
                   <MenuItem value="">All</MenuItem>
                   {(() => {
                     let uniqueValues = new Set();
-                    if (field === "Running_Month" || field === "Previous_Month" || field === "Last_Previous_Month_Month_Month") {
+                    if (field === "Running_Month" || field === "Previous_Month" || field === "Last_Previous_Month") {
                       uniqueValues.add("No Payment");
                       uniqueValues.add("Payment");
                     }
 
                     results.forEach(r => {
                       let valueToExtract;
-                      if (field === "Running_Month" || field === "Previous_Month" || field === "Last_Previous_Month_Month_Month") {
+                      if (field === "Running_Month" || field === "Previous_Month" || field === "Last_Previous_Month") {
                         valueToExtract = r[field];
                       } else {
                         // Use .toLowerCase() to match the filtering logic for Area/Balance
@@ -661,7 +661,7 @@ function App() {
                   <StyledTableCell>Mobile_No</StyledTableCell>
                   <StyledTableCell>Running_Month</StyledTableCell>
                   <StyledTableCell>Previous_Month</StyledTableCell>
-                  <StyledTableCell>Last_Previous_Month_Month_Month</StyledTableCell>
+                  <StyledTableCell>Last_Previous_Month</StyledTableCell>
                   <StyledTableCell>Count</StyledTableCell>
                   <StyledTableCell>Total_Due</StyledTableCell>
                 </TableRow>
@@ -681,7 +681,7 @@ function App() {
                         {/* Conditional color for payment status */}
                         <TableCell sx={{ color: row.Running_Month === "No Payment" ? "error.main" : "success.main" }}>{row.Running_Month}</TableCell>
                         <TableCell sx={{ color: row.Previous_Month === "No Payment" ? "error.main" : "success.main" }}>{row.Previous_Month}</TableCell>
-                        <TableCell sx={{ color: row.Last_Previous_Month_Month_Month === "No Payment" ? "error.main" : "success.main" }}>{row.Last_Previous_Month_Month_Month}</TableCell>
+                        <TableCell sx={{ color: row.Last_Previous_Month === "No Payment" ? "error.main" : "success.main" }}>{row.Last_Previous_Month}</TableCell>
                         <TableCell>{row.totalCount}</TableCell>
                         {/* Display the newly calculated Total Due */}
                         <TableCell>{row.balance}</TableCell>
@@ -748,7 +748,7 @@ function App() {
                   </p>
                   <p><strong>Running_Month:</strong> <Box component="span" color={selectedRow.Running_Month === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Running_Month}</Box></p>
                   <p><strong>Previous_Month:</strong> <Box component="span" color={selectedRow.Previous_Month === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Previous_Month}</Box></p>
-                  <p><strong>Last_Previous_Month_Month_Month:</strong> <Box component="span" color={selectedRow.Last_Previous_Month_Month_Month === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Last_Previous_Month_Month_Month}</Box></p>
+                  <p><strong>Last_Previous_Month:</strong> <Box component="span" color={selectedRow.Last_Previous_Month === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Last_Previous_Month}</Box></p>
                   <p><strong>Count:</strong> <Box component="span" fontWeight="bold">{selectedRow.totalCount}</Box></p>
                   {/* Display the calculated Total Due */}
                   <p><strong>Total Due:</strong> <Box component="span" fontWeight="bold" color="warning.main">{selectedRow.balance}</Box></p>
