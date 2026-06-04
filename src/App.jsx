@@ -108,8 +108,8 @@ const getDefaultMessage = (row) => {
 function App() {
   const [results, setResults] = useState([]);
   const [filteredResults, setFilteredResults] = useState([]);
-  const [filter, setFilter] = useState({ Running: "", Previous: "", Last-Previous: "", Area: "", Balance: "" });
-  const [summary, setSummary] = useState({ Running: 0, Previous: 0, Last-Previous: 0 });
+  const [filter, setFilter] = useState({ Running: "", Previous: "", Last_Previous: "", Area: "", Balance: "" });
+  const [summary, setSummary] = useState({ Running: 0, Previous: 0, Last_Previous: 0 });
   const [selectedRow, setSelectedRow] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [page, setPage] = useState(0);
@@ -224,9 +224,9 @@ function App() {
         // Determine if payment was "No Payment" (true means no payment)
         const isRunningDue = true; // Always assume current month due for this report
         const isPreviousDue = sheet2Ids.has(customer_id);
-        const isLast-PreviousDue = sheet3Ids.has(customer_id);
+        const isLast_PreviousDue = sheet3Ids.has(customer_id);
 
-        const totalCount = (isRunningDue ? 1 : 0) + (isPreviousDue ? 1 : 0) + (isLast-PreviousDue ? 1 : 0);
+        const totalCount = (isRunningDue ? 1 : 0) + (isPreviousDue ? 1 : 0) + (isLast_PreviousDue ? 1 : 0);
         
         return {
           serial: index + 1,
@@ -236,7 +236,7 @@ function App() {
           client_phone,
           Running: isRunningDue ? "No Payment" : "Payment",
           Previous: isPreviousDue ? "No Payment" : "Payment",
-          Last-Previous: isLast-PreviousDue ? "No Payment" : "Payment",
+          Last_Previous: isLast_PreviousDue ? "No Payment" : "Payment",
           totalCount: totalCount,
           // Store the calculated, formatted due amount
           balance: `${parseInt(final_due_amount)} TK`, 
@@ -252,7 +252,7 @@ function App() {
       const summaryStats = {
         Running: final.filter((r) => r.Running === "No Payment").length,
         Previous: final.filter((r) => r.Previous === "No Payment").length,
-        Last-Previous: final.filter((r) => r.Last-Previous === "No Payment").length,
+        Last_Previous: final.filter((r) => r.Last_Previous === "No Payment").length,
       };
       setSummary(summaryStats);
       showSnackbar("Data loaded successfully!", "success");
@@ -277,7 +277,7 @@ function App() {
     const overdueMonths = [
         row.Running === "No Payment" && "Running",
         row.Previous === "No Payment" && "Previous",
-        row.Last-Previous === "No Payment" && "Last-Previous",
+        row.Last_Previous === "No Payment" && "Last_Previous",
     ].filter(Boolean);
     
     const dueStatusText = overdueMonths.length > 0 ? 
@@ -383,7 +383,7 @@ function App() {
   
   /**
    * Handles changes in filter dropdowns.
-   * @param {string} field - The filter field (e.g., "Last-Previous", "Area").
+   * @param {string} field - The filter field (e.g., "Last_Previous", "Area").
    * @param {string} value - The selected filter value.
    */
   const handleFilterChange = (field, value) => {
@@ -402,7 +402,7 @@ function App() {
       (row) =>
         (!updatedFilter.Running || row.Running === updatedFilter.Running) &&
         (!updatedFilter.Previous || row.Previous === updatedFilter.Previous) &&
-        (!updatedFilter.Last-Previous || row.Last-Previous === updatedFilter.Last-Previous) &&
+        (!updatedFilter.Last_Previous || row.Last_Previous === updatedFilter.Last_Previous) &&
         (!updatedFilter.Area || (row.area && row.area.toLowerCase() === updatedFilter.Area.toLowerCase())) &&
         (!updatedFilter.Balance || (row.balance && row.balance.toLowerCase() === updatedFilter.Balance.toLowerCase())) &&
         (!searchText ||
@@ -555,7 +555,7 @@ function App() {
               Previous No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Previous}</Box>
             </Typography>
             <Typography variant="subtitle1" component="span" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-              Last-Previous No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Last-Previous}</Box>
+              Last_Previous No Payment: <Box component="span" fontWeight="bold" color="error.main">{summary.Last_Previous}</Box>
             </Typography>
           </Box>
           
@@ -599,7 +599,7 @@ function App() {
           <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap" mb={2} sx={{ 
             '& .MuiFormControl-root, & .MuiTextField-root': { minWidth: { xs: '45%', sm: 140 } } 
           }}>
-            {["Running", "Previous", "Last-Previous", "Area", "Balance"].map((field) => (
+            {["Running", "Previous", "Last_Previous", "Area", "Balance"].map((field) => (
               <FormControl key={field} sx={{ minWidth: 120 }} size="small">
                 <InputLabel>{field}</InputLabel>
                 <Select
@@ -610,14 +610,14 @@ function App() {
                   <MenuItem value="">All</MenuItem>
                   {(() => {
                     let uniqueValues = new Set();
-                    if (field === "Running" || field === "Previous" || field === "Last-Previous") {
+                    if (field === "Running" || field === "Previous" || field === "Last_Previous") {
                       uniqueValues.add("No Payment");
                       uniqueValues.add("Payment");
                     }
 
                     results.forEach(r => {
                       let valueToExtract;
-                      if (field === "Running" || field === "Previous" || field === "Last-Previous") {
+                      if (field === "Running" || field === "Previous" || field === "Last_Previous") {
                         valueToExtract = r[field];
                       } else {
                         // Use .toLowerCase() to match the filtering logic for Area/Balance
@@ -661,7 +661,7 @@ function App() {
                   <StyledTableCell>Mobile_No</StyledTableCell>
                   <StyledTableCell>Running</StyledTableCell>
                   <StyledTableCell>Previous</StyledTableCell>
-                  <StyledTableCell>Last-Previous</StyledTableCell>
+                  <StyledTableCell>Last_Previous</StyledTableCell>
                   <StyledTableCell>Count</StyledTableCell>
                   <StyledTableCell>Total_Due</StyledTableCell>
                 </TableRow>
@@ -681,7 +681,7 @@ function App() {
                         {/* Conditional color for payment status */}
                         <TableCell sx={{ color: row.Running === "No Payment" ? "error.main" : "success.main" }}>{row.Running}</TableCell>
                         <TableCell sx={{ color: row.Previous === "No Payment" ? "error.main" : "success.main" }}>{row.Previous}</TableCell>
-                        <TableCell sx={{ color: row.Last-Previous === "No Payment" ? "error.main" : "success.main" }}>{row.Last-Previous}</TableCell>
+                        <TableCell sx={{ color: row.Last_Previous === "No Payment" ? "error.main" : "success.main" }}>{row.Last_Previous}</TableCell>
                         <TableCell>{row.totalCount}</TableCell>
                         {/* Display the newly calculated Total Due */}
                         <TableCell>{row.balance}</TableCell>
@@ -748,7 +748,7 @@ function App() {
                   </p>
                   <p><strong>Running:</strong> <Box component="span" color={selectedRow.Running === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Running}</Box></p>
                   <p><strong>Previous:</strong> <Box component="span" color={selectedRow.Previous === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Previous}</Box></p>
-                  <p><strong>Last-Previous:</strong> <Box component="span" color={selectedRow.Last-Previous === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Last-Previous}</Box></p>
+                  <p><strong>Last_Previous:</strong> <Box component="span" color={selectedRow.Last_Previous === "No Payment" ? "error.main" : "success.main"}>{selectedRow.Last_Previous}</Box></p>
                   <p><strong>Count:</strong> <Box component="span" fontWeight="bold">{selectedRow.totalCount}</Box></p>
                   {/* Display the calculated Total Due */}
                   <p><strong>Total Due:</strong> <Box component="span" fontWeight="bold" color="warning.main">{selectedRow.balance}</Box></p>
